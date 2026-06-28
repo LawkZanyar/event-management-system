@@ -15,17 +15,38 @@ def get_db():
 
 
 @router.get("/events")
-def get_events(db:Session=Depends(get_db)):
-    return db.query(Event).all()
+def get_events(db: Session = Depends(get_db)):
+
+    events = db.query(Event).all()
+
+    return [
+        {
+            "id": event.id,
+            "title": event.title,
+            "description": event.description,
+            "date": event.date,
+            "location": event.location
+        }
+        for event in events
+    ]
 
 
 @router.post("/events")
-def create_event(event:dict, db:Session=Depends(get_db)):
-    new_event=Event(**event)
+def create_event(event: dict, db: Session = Depends(get_db)):
+
+    new_event = Event(**event)
+
     db.add(new_event)
     db.commit()
     db.refresh(new_event)
-    return new_event
+
+    return {
+        "id": new_event.id,
+        "title": new_event.title,
+        "description": new_event.description,
+        "date": new_event.date,
+        "location": new_event.location
+    }
 
 
 @router.get("/events/{id}")
