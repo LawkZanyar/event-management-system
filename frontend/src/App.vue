@@ -5,7 +5,7 @@ import axios from 'axios'
 const events = ref([])
 
 const API_URL =
-  "mindful-manifestation-production.up.railway.app/api/events"
+  "https://mindful-manifestation-production.up.railway.app/api/events"
 
 
 onMounted(async () => {
@@ -14,13 +14,13 @@ onMounted(async () => {
 
     const response = await axios.get(API_URL)
 
-    console.log(response.data)
+    console.log("API DATA:", response.data)
 
     events.value = response.data
 
-  } catch(error) {
+  } catch (error) {
 
-    console.log(error)
+    console.error("API ERROR:", error)
 
   }
 
@@ -31,18 +31,50 @@ onMounted(async () => {
 
 <template>
 
-<h1>Event Management System</h1>
+  <div>
+
+    <h1>Event Management System</h1>
 
 
-<ul>
+    <div v-if="events.length === 0">
 
-<li v-for="event in events" :key="event.id">
+      No events found
 
-{{ event.title }} - {{ event.location }}
+    </div>
 
-</li>
 
-</ul>
+    <ul>
 
+      <li 
+        v-for="event in events" 
+        :key="event.id"
+      >
+
+        <h3>
+          {{ event.title }}
+        </h3>
+
+
+        <p>
+          Description: {{ event.description }}
+        </p>
+
+
+        <p>
+          Date: {{ event.date }}
+        </p>
+
+
+        <p>
+          Location: {{ event.location }}
+        </p>
+
+
+      </li>
+
+    </ul>
+
+
+  </div>
 
 </template>
