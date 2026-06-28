@@ -5,7 +5,7 @@ import axios from 'axios'
 const events = ref([])
 
 onMounted(async () => {
-  const res = await axios.get('http://localhost:8000/api/events')
+  const res = await axios.get('mindful-manifestation-production.up.railway.app/api/events')
   events.value = res.data
 })
 </script>
