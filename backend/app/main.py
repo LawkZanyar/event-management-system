@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI  # pyright: ignore[reportMissingImports]
+from fastapi.middleware.cors import CORSMiddleware  # pyright: ignore[reportMissingImports]
 
 from app.database import Base, engine
 from app.routes import router

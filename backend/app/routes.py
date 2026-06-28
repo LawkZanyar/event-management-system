@@ -1,6 +1,6 @@
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends  # pyright: ignore[reportMissingImports]
+from typing import Any
 from app.database import SessionLocal
 from app.models import Event
 
@@ -15,9 +15,11 @@ def get_db():
 
 
 @router.get("/events")
-def get_events(db: Session = Depends(get_db)):
+def get_events(db: Any = Depends(get_db)):
 
     events = db.query(Event).all()
+
+    print("DATABASE EVENTS:", events)
 
     return [
         {
@@ -32,7 +34,7 @@ def get_events(db: Session = Depends(get_db)):
 
 
 @router.post("/events")
-def create_event(event: dict, db: Session = Depends(get_db)):
+def create_event(event: dict, db: Any = Depends(get_db)):
 
     new_event = Event(**event)
 
@@ -50,12 +52,12 @@ def create_event(event: dict, db: Session = Depends(get_db)):
 
 
 @router.get("/events/{id}")
-def get_event(id:int, db:Session=Depends(get_db)):
+def get_event(id:int, db:Any=Depends(get_db)):
     return db.query(Event).filter(Event.id==id).first()
 
 
 @router.delete("/events/{id}")
-def delete_event(id:int, db:Session=Depends(get_db)):
+def delete_event(id:int, db:Any=Depends(get_db)):
     event=db.query(Event).filter(Event.id==id).first()
     db.delete(event)
     db.commit()
