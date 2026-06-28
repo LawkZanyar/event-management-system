@@ -4,25 +4,19 @@ import axios from 'axios'
 
 const BASE_URL = "https://mindful-manifestation-production.up.railway.app/api"
 
-// ── State ──
-const view = ref('login')        // 'login' | 'register' | 'events'
+const view = ref('login')
 const currentUser = ref(null)
-
 const events = ref([])
 const loadingEvents = ref(false)
 
-// ── Auth forms ──
 const loginForm = ref({ email: '', password: '' })
 const registerForm = ref({ name: '', email: '', password: '' })
 const authError = ref('')
 const authSuccess = ref('')
 
-// ── Event registration ──
-const registeringFor = ref(null)   // event_id currently being registered for
-const regDate = ref('')
+const registeringFor = ref(null)
 const regMessage = ref('')
 
-// ── Load events ──
 async function loadEvents() {
   loadingEvents.value = true
   try {
@@ -35,12 +29,12 @@ async function loadEvents() {
   }
 }
 
-// ── Login ──
 async function login() {
   authError.value = ''
   try {
     const res = await axios.post(`${BASE_URL}/login`, loginForm.value)
     currentUser.value = res.data.user
+    localStorage.setItem('user', JSON.stringify(res.data.user))
     view.value = 'events'
     loadEvents()
   } catch (e) {
@@ -48,7 +42,6 @@ async function login() {
   }
 }
 
-// ── Register account ──
 async function register() {
   authError.value = ''
   authSuccess.value = ''
@@ -62,7 +55,6 @@ async function register() {
   }
 }
 
-// ── Register for event ──
 async function registerForEvent(eventId) {
   regMessage.value = ''
   try {
@@ -78,23 +70,27 @@ async function registerForEvent(eventId) {
   }
 }
 
-// ── Logout ──
 function logout() {
   currentUser.value = null
   events.value = []
   loginForm.value = { email: '', password: '' }
+  localStorage.removeItem('user')
   view.value = 'login'
 }
 
 onMounted(() => {
-  // nothing on mount — user must log in first
+  const saved = localStorage.getItem('user')
+  if (saved) {
+    currentUser.value = JSON.parse(saved)
+    view.value = 'events'
+    loadEvents()
+  }
 })
 </script>
 
 <template>
   <div class="page">
 
-    <!-- ── Header ── -->
     <header class="header">
       <div class="header-inner">
         <div class="logo">📅</div>
@@ -111,7 +107,6 @@ onMounted(() => {
 
     <main class="main">
 
-      <!-- ══ LOGIN VIEW ══ -->
       <div v-if="view === 'login'" class="auth-wrapper">
         <div class="auth-card">
           <h2 class="auth-title">Welcome Back</h2>
@@ -137,7 +132,6 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- ══ REGISTER VIEW ══ -->
       <div v-if="view === 'register'" class="auth-wrapper">
         <div class="auth-card">
           <h2 class="auth-title">Create Account</h2>
@@ -168,7 +162,6 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- ══ EVENTS VIEW ══ -->
       <div v-if="view === 'events'">
 
         <div class="events-header">
@@ -211,7 +204,6 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Register for event section -->
             <div class="card-actions">
               <button
                 class="btn-register"
@@ -261,7 +253,6 @@ onMounted(() => {
   flex-direction: column;
 }
 
-/* ── Header ── */
 .header {
   background-color: #1c2e4a;
   padding: 20px 40px;
@@ -318,7 +309,6 @@ onMounted(() => {
   color: #ffffff;
 }
 
-/* ── Main ── */
 .main {
   flex: 1;
   max-width: 1100px;
@@ -327,7 +317,6 @@ onMounted(() => {
   padding: 0 24px;
 }
 
-/* ── Auth ── */
 .auth-wrapper {
   display: flex;
   justify-content: center;
@@ -357,9 +346,7 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
-.form-group {
-  margin-bottom: 16px;
-}
+.form-group { margin-bottom: 16px; }
 
 .form-group label {
   display: block;
@@ -380,9 +367,7 @@ onMounted(() => {
   transition: border 0.15s;
 }
 
-.form-group input:focus {
-  border-color: #0d7377;
-}
+.form-group input:focus { border-color: #0d7377; }
 
 .btn-primary {
   width: 100%;
@@ -398,9 +383,7 @@ onMounted(() => {
   transition: background 0.15s;
 }
 
-.btn-primary:hover {
-  background-color: #0d7377;
-}
+.btn-primary:hover { background-color: #0d7377; }
 
 .auth-switch {
   text-align: center;
@@ -415,11 +398,8 @@ onMounted(() => {
   cursor: pointer;
 }
 
-.link:hover {
-  text-decoration: underline;
-}
+.link:hover { text-decoration: underline; }
 
-/* ── Alerts ── */
 .alert {
   padding: 10px 14px;
   border-radius: 8px;
@@ -439,14 +419,9 @@ onMounted(() => {
   border: 1px solid #86efac;
 }
 
-.reg-alert {
-  margin-bottom: 20px;
-}
+.reg-alert { margin-bottom: 20px; }
 
-/* ── Events header ── */
-.events-header {
-  margin-bottom: 28px;
-}
+.events-header { margin-bottom: 28px; }
 
 .events-title {
   font-size: 24px;
@@ -460,7 +435,6 @@ onMounted(() => {
   margin-top: 4px;
 }
 
-/* ── Empty ── */
 .empty {
   text-align: center;
   padding: 80px 20px;
@@ -471,14 +445,12 @@ onMounted(() => {
 .empty-text { font-size: 20px; font-weight: 600; color: #334155; margin-bottom: 6px; }
 .empty-hint { font-size: 14px; color: #94a3b8; }
 
-/* ── Grid ── */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
 }
 
-/* ── Card ── */
 .card {
   background: #ffffff;
   border-radius: 12px;
@@ -549,10 +521,7 @@ onMounted(() => {
 
 .meta-icon { font-size: 15px; }
 
-/* ── Card actions ── */
-.card-actions {
-  margin-top: auto;
-}
+.card-actions { margin-top: auto; }
 
 .btn-register {
   width: 100%;
@@ -567,9 +536,7 @@ onMounted(() => {
   transition: background 0.15s;
 }
 
-.btn-register:hover {
-  background-color: #0a5c60;
-}
+.btn-register:hover { background-color: #0a5c60; }
 
 .confirm-box {
   background: #f8fafc;
@@ -620,7 +587,6 @@ onMounted(() => {
 
 .btn-cancel:hover { background: #cbd5e1; }
 
-/* ── Footer ── */
 .footer {
   background-color: #1c2e4a;
   text-align: center;
